@@ -141,6 +141,7 @@ const FormularioClinicoGamificado = () => {
   const [isSearchingNit, setIsSearchingNit] = useState(false);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
   const [pendingSearch, setPendingSearch] = useState('');
+  const [showSearchInstructions, setShowSearchInstructions] = useState(false);
 
   // Validación y formato de campos numéricos
   const validateNumericField = (value: string, fieldType: 'integer' | 'phone' | 'nit'): { isValid: boolean; error?: string } => {
@@ -695,27 +696,40 @@ const FormularioClinicoGamificado = () => {
               ))}
             </select>
           </div>
-        {/* Info box con instrucciones de búsqueda REPS */}
-        <div className="md:col-span-2 bg-accent/5 border border-accent/20 rounded-lg p-4 space-y-2">
-          <div className="flex items-start gap-2">
-            <Info className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-            <div className="space-y-2 text-sm">
-              <p className="font-medium text-accent">💡 Instrucciones de búsqueda:</p>
-              <ul className="space-y-1 text-muted-foreground">
-                <li>• Ingrese la razón social completa o parcial de la institución</li>
-                <li>• El sistema extraerá automáticamente el NIT asociado</li>
-                <li>• Se mostrarán todos los datos disponibles en el REPS:</li>
-                <li className="ml-4">- Información básica de la institución</li>
-                <li className="ml-4">- Servicios habilitados</li>
-                <li className="ml-4">- Estado del registro</li>
-                <li className="ml-4">- Capacidad instalada</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-foreground mb-1">Razón Social *</label>
+          <div className="flex items-center gap-2 mb-1">
+            <label className="text-sm font-medium text-foreground">Razón Social *</label>
+            <button
+              type="button"
+              onClick={() => setShowSearchInstructions(!showSearchInstructions)}
+              className="text-accent hover:text-accent/80 transition-colors"
+              title="Ver instrucciones de búsqueda"
+            >
+              <Info className="h-4 w-4" />
+            </button>
+          </div>
+          
+          {/* Instrucciones colapsables */}
+          {showSearchInstructions && (
+            <div className="mb-3 bg-accent/5 border border-accent/20 rounded-lg p-4 space-y-2 animate-fade-in">
+              <div className="flex items-start gap-2">
+                <Info className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                <div className="space-y-2 text-sm">
+                  <p className="font-medium text-accent">💡 Instrucciones de búsqueda:</p>
+                  <ul className="space-y-1 text-muted-foreground">
+                    <li>• Ingrese la razón social completa o parcial de la institución</li>
+                    <li>• El sistema extraerá automáticamente el NIT asociado</li>
+                    <li>• Se mostrarán todos los datos disponibles en el REPS:</li>
+                    <li className="ml-4">- Información básica de la institución</li>
+                    <li className="ml-4">- Servicios habilitados</li>
+                    <li className="ml-4">- Estado del registro</li>
+                    <li className="ml-4">- Capacidad instalada</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-2">
             <div className="flex-1 relative">
               <input
