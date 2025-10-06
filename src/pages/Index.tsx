@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronLeft, Award, Download, CheckCircle, Building2, MapPin, Stethoscope, Activity, Star, Trophy, Lock, Save, LogOut, Loader2, Search } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Award, Download, CheckCircle, Building2, MapPin, Stethoscope, Activity, Star, Trophy, Lock, Save, LogOut, Loader2, Search, HelpCircle, Info, AlertCircle } from 'lucide-react';
 import { departamentos, municipiosPorDepartamento } from '@/data/colombiaData';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 
 interface InformacionGeneral {
@@ -138,6 +139,8 @@ const FormularioClinicoGamificado = () => {
   const [saveTimeout, setSaveTimeout] = useState<NodeJS.Timeout | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isSearchingNit, setIsSearchingNit] = useState(false);
+  const [showWarningDialog, setShowWarningDialog] = useState(false);
+  const [pendingSearch, setPendingSearch] = useState('');
 
   // Validación y formato de campos numéricos
   const validateNumericField = (value: string, fieldType: 'integer' | 'phone' | 'nit'): { isValid: boolean; error?: string } => {
@@ -237,7 +240,7 @@ const FormularioClinicoGamificado = () => {
     handleInputChange(section, field, formattedValue);
   };
 
-  // Función para buscar el NIT automáticamente
+  // Función para buscar el NIT automáticamente - muestra el modal primero
   const searchNit = async () => {
     const razonSocial = (formData.informacionGeneral as any).razonSocial;
     
@@ -246,12 +249,21 @@ const FormularioClinicoGamificado = () => {
       return;
     }
 
+    // Mostrar el modal de advertencia antes de buscar
+    setPendingSearch(razonSocial);
+    setShowWarningDialog(true);
+  };
+
+  // Función que procede con la búsqueda después de confirmar el modal
+  const proceedWithSearch = async () => {
+    setShowWarningDialog(false);
     setIsSearchingNit(true);
+    
     try {
-      console.log('Buscando NIT para:', razonSocial);
+      console.log('Buscando NIT para:', pendingSearch);
       
       const { data, error } = await supabase.functions.invoke('search-nit', {
-        body: { companyName: razonSocial }
+        body: { companyName: pendingSearch }
       });
 
       if (error) {
@@ -271,6 +283,7 @@ const FormularioClinicoGamificado = () => {
       toast.error('Error al conectar con el servicio de búsqueda');
     } finally {
       setIsSearchingNit(false);
+      setPendingSearch('');
     }
   };
 
@@ -682,25 +695,67 @@ const FormularioClinicoGamificado = () => {
               ))}
             </select>
           </div>
+        {/* Info box con instrucciones de búsqueda REPS */}
+        <div className="md:col-span-2 bg-accent/5 border border-accent/20 rounded-lg p-4 space-y-2">
+          <div className="flex items-start gap-2">
+            <Info className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+            <div className="space-y-2 text-sm">
+              <p className="font-medium text-accent">💡 Instrucciones de búsqueda:</p>
+              <ul className="space-y-1 text-muted-foreground">
+                <li>• Ingrese la razón social completa o parcial de la institución</li>
+                <li>• El sistema extraerá automáticamente el NIT asociado</li>
+                <li>• Se mostrarán todos los datos disponibles en el REPS:</li>
+                <li className="ml-4">- Información básica de la institución</li>
+                <li className="ml-4">- Servicios habilitados</li>
+                <li className="ml-4">- Estado del registro</li>
+                <li className="ml-4">- Capacidad instalada</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-foreground mb-1">Razón Social *</label>
           <div className="flex gap-2">
-            <input
-              type="text"
-              className="flex-1 px-3 py-2 border border-input bg-background rounded-lg focus:ring-2 focus:ring-primary"
-              value={(formData.informacionGeneral as any).razonSocial || ''}
-              onChange={(e) => handleInputChange('informacionGeneral', 'razonSocial', e.target.value)}
-              placeholder="Ingrese la razón social"
-            />
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                className="w-full px-3 py-2 pr-10 border border-input bg-background rounded-lg focus:ring-2 focus:ring-primary"
+                value={(formData.informacionGeneral as any).razonSocial || ''}
+                onChange={(e) => handleInputChange('informacionGeneral', 'razonSocial', e.target.value)}
+                placeholder="Ej: Hospital Universitario San Vicente..."
+              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-accent transition-colors"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" className="max-w-xs">
+                    <p className="text-sm">
+                      Ingrese el nombre completo o parcial de la institución. 
+                      Ejemplo: "Hospital San Vicente" o "Clínica Las Américas"
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <button
               type="button"
               onClick={searchNit}
               disabled={isSearchingNit || !(formData.informacionGeneral as any).razonSocial}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
               title="Buscar NIT automáticamente"
             >
               {isSearchingNit ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span className="hidden sm:inline">Buscando...</span>
+                </>
               ) : (
                 <Search className="h-5 w-5" />
               )}
@@ -1873,6 +1928,39 @@ const FormularioClinicoGamificado = () => {
             })}
           </div>
         </div>
+
+        {/* Modal de advertencia del REPS */}
+        <AlertDialog open={showWarningDialog} onOpenChange={setShowWarningDialog}>
+          <AlertDialogContent className="border-accent/30 max-w-lg">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 text-accent text-xl">
+                <AlertCircle className="h-6 w-6" />
+                Información del REPS
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-3 text-base pt-2">
+                <p>
+                  Los datos mostrados corresponden a la última actualización oficial del{' '}
+                  <span className="font-semibold">Registro Especial de Prestadores de Servicios de Salud (REPS)</span>.
+                </p>
+                <p>
+                  La información puede estar sujeta a cambios según las actualizaciones del registro.
+                </p>
+                <p className="font-medium text-accent">
+                  Por favor verificar la información.
+                </p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={proceedWithSearch}
+                className="bg-accent hover:bg-accent/90 text-accent-foreground"
+              >
+                Entendido, continuar con la búsqueda
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
