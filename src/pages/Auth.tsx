@@ -149,63 +149,64 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-indigo-100 p-3 sm:p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <div className="flex justify-center">
             <img 
               src={indigoLogo} 
               alt="IndiGO Logo" 
-              className="h-40 w-auto object-contain drop-shadow-2xl animate-float"
+              className="h-32 sm:h-40 w-auto object-contain drop-shadow-2xl animate-float"
             />
           </div>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-indigo-100/50 border border-indigo-200">
-            <TabsTrigger value="login" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Iniciar Sesión</TabsTrigger>
-            <TabsTrigger value="signup" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Registrarse</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-indigo-100/50 border border-indigo-200 h-auto">
+            <TabsTrigger value="login" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white py-2.5 sm:py-2 text-sm sm:text-base">Iniciar Sesión</TabsTrigger>
+            <TabsTrigger value="signup" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white py-2.5 sm:py-2 text-sm sm:text-base">Registrarse</TabsTrigger>
           </TabsList>
 
           <TabsContent value="login">
             <Card className="border-indigo-200 shadow-lg shadow-indigo-100/50">
-              <CardHeader className="bg-gradient-to-r from-indigo-50 to-transparent">
-                <CardTitle className="flex items-center gap-2 text-indigo-900">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-transparent p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-indigo-900 text-lg sm:text-xl">
                   <LogIn className="w-5 h-5 text-indigo-600" />
                   Iniciar Sesión
                 </CardTitle>
-                <CardDescription className="text-indigo-600">
+                <CardDescription className="text-indigo-600 text-sm">
                   Ingresa tus credenciales para acceder al formulario
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Correo Electrónico</Label>
+                    <Label htmlFor="login-email" className="text-sm">Correo Electrónico</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-indigo-500" />
                       <Input
                         id="login-email"
                         type="email"
+                        inputMode="email"
                         placeholder="tu@correo.com"
-                        className="pl-10 border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500"
+                        className="pl-10 border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 h-11 text-base"
                         value={loginData.email}
                         onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                         disabled={isLoading}
                       />
                     </div>
-                    {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                    {errors.email && <p className="text-xs sm:text-sm text-destructive">{errors.email}</p>}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Contraseña</Label>
+                    <Label htmlFor="login-password" className="text-sm">Contraseña</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-indigo-500" />
                       <Input
                         id="login-password"
                         type={showLoginPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        className="pl-10 pr-10 border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500"
+                        className="pl-10 pr-10 border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 h-11 text-base"
                         value={loginData.password}
                         onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                         disabled={isLoading}
@@ -213,16 +214,17 @@ const Auth = () => {
                       <button
                         type="button"
                         onClick={() => setShowLoginPassword(!showLoginPassword)}
-                        className="absolute right-3 top-3 text-indigo-400 hover:text-indigo-600 transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-indigo-400 hover:text-indigo-600 transition-colors p-2 touch-target"
                         disabled={isLoading}
+                        aria-label={showLoginPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
                         {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
-                    {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                    {errors.password && <p className="text-xs sm:text-sm text-destructive">{errors.password}</p>}
                   </div>
 
-                  <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200 h-11 text-base touch-target" disabled={isLoading}>
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
