@@ -202,11 +202,11 @@ const Auth = () => {
               {partnerLogos.map((logo, index) => (
                 <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/3 sm:basis-1/4 md:basis-1/5">
                   <div className="p-1">
-                    <div className="flex items-center justify-center h-16 sm:h-20 bg-white/60 backdrop-blur-sm rounded-lg border border-indigo-100/50 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
+                    <div className="flex items-center justify-center h-16 sm:h-20 bg-white rounded-lg border-2 border-indigo-200 shadow-md hover:shadow-lg hover:border-indigo-300 transition-all duration-300 hover:scale-105">
                       <img
                         src={logo.src}
                         alt={logo.alt}
-                        className="max-h-12 sm:max-h-14 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
+                        className="max-h-10 sm:max-h-12 w-auto object-contain p-2"
                         loading="lazy"
                       />
                     </div>
