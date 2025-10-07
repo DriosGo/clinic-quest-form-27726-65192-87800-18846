@@ -5,11 +5,43 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Lock, Mail, User, LogIn, UserPlus, Loader2, Eye, EyeOff } from 'lucide-react';
 import { z } from 'zod';
+import Autoplay from 'embla-carousel-autoplay';
+
+// Import logos
 import indigoLogo from '/Indigo.png';
+import genexiaBlanco from '/Genexia (Blanco).png';
+import genexiaNegro from '/Genexia (Negro).png';
+import indira2 from '/Indira (2).png';
+import indiraBlanco from '/Indira (Blanco).png';
+import logoCoral01 from '/Logo Coral-01.png';
+import logoCoral02 from '/Logo Coral-02.png';
+import logoCoral03 from '/Logo Coral-03.png';
+import logoCoral04 from '/Logo Coral-04.png';
+import logoOneViewBlanco from '/Logo One View Blanco.png';
+import logoOneViewNegro from '/Logo One View negro.png';
+import vie1 from '/Vie (1).png';
+import vieBlanco from '/Vie (Blanco).png';
+
+// Logos array for carousel
+const partnerLogos = [
+  { src: genexiaBlanco, alt: 'Genexia' },
+  { src: indira2, alt: 'Indira' },
+  { src: logoCoral01, alt: 'Logo Coral' },
+  { src: logoOneViewBlanco, alt: 'One View' },
+  { src: vie1, alt: 'Vie' },
+  { src: genexiaNegro, alt: 'Genexia' },
+  { src: indiraBlanco, alt: 'Indira' },
+  { src: logoCoral02, alt: 'Logo Coral' },
+  { src: logoCoral03, alt: 'Logo Coral' },
+  { src: logoCoral04, alt: 'Logo Coral' },
+  { src: logoOneViewNegro, alt: 'One View' },
+  { src: vieBlanco, alt: 'Vie' }
+];
 
 // Validation schemas
 const signUpSchema = z.object({
@@ -30,6 +62,11 @@ const loginSchema = z.object({
 const Auth = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Autoplay plugin for carousel
+  const plugin = React.useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: true })
+  );
   const [signUpData, setSignUpData] = useState({
     nombreCompleto: '',
     email: '',
@@ -151,14 +188,45 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-indigo-100 p-3 sm:p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-6 sm:mb-8">
+        <div className="text-center mb-4 sm:mb-6">
           <div className="flex justify-center">
             <img 
               src={indigoLogo} 
               alt="IndiGO Logo" 
-              className="h-32 sm:h-40 w-auto object-contain drop-shadow-2xl animate-float"
+              className="h-24 sm:h-32 w-auto object-contain drop-shadow-2xl animate-float"
             />
           </div>
+        </div>
+
+        {/* Partner Logos Carousel */}
+        <div className="mb-6 sm:mb-8 px-4">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            plugins={[plugin.current]}
+            className="w-full"
+            onMouseEnter={() => plugin.current.stop()}
+            onMouseLeave={() => plugin.current.play()}
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {partnerLogos.map((logo, index) => (
+                <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/3 sm:basis-1/4 md:basis-1/5">
+                  <div className="p-1">
+                    <div className="flex items-center justify-center h-16 sm:h-20 bg-white/60 backdrop-blur-sm rounded-lg border border-indigo-100/50 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
+                      <img
+                        src={logo.src}
+                        alt={logo.alt}
+                        className="max-h-12 sm:max-h-14 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
