@@ -14,33 +14,21 @@ import Autoplay from 'embla-carousel-autoplay';
 
 // Import logos
 import indigoLogo from '/Indigo.png';
-import genexiaBlanco from '/Genexia (Blanco).png';
-import genexiaNegro from '/Genexia (Negro).png';
-import indira2 from '/Indira (2).png';
-import indiraBlanco from '/Indira (Blanco).png';
-import logoCoral01 from '/Logo Coral-01.png';
-import logoCoral02 from '/Logo Coral-02.png';
-import logoCoral03 from '/Logo Coral-03.png';
-import logoCoral04 from '/Logo Coral-04.png';
-import logoOneViewBlanco from '/Logo One View Blanco.png';
-import logoOneViewNegro from '/Logo One View negro.png';
-import vie1 from '/Vie (1).png';
-import vieBlanco from '/Vie (Blanco).png';
 
-// Logos array for carousel
+// Logos array for carousel - using public folder paths
 const partnerLogos = [
-  { src: genexiaBlanco, alt: 'Genexia' },
-  { src: indira2, alt: 'Indira' },
-  { src: logoCoral01, alt: 'Logo Coral' },
-  { src: logoOneViewBlanco, alt: 'One View' },
-  { src: vie1, alt: 'Vie' },
-  { src: genexiaNegro, alt: 'Genexia' },
-  { src: indiraBlanco, alt: 'Indira' },
-  { src: logoCoral02, alt: 'Logo Coral' },
-  { src: logoCoral03, alt: 'Logo Coral' },
-  { src: logoCoral04, alt: 'Logo Coral' },
-  { src: logoOneViewNegro, alt: 'One View' },
-  { src: vieBlanco, alt: 'Vie' }
+  { src: '/images/genexia-blanco.png', alt: 'Genexia' },
+  { src: '/images/indira-2.png', alt: 'Indira' },
+  { src: '/images/logo-coral-01.png', alt: 'Logo Coral' },
+  { src: '/images/logo-oneview-blanco.png', alt: 'One View' },
+  { src: '/images/vie-1.png', alt: 'Vie' },
+  { src: '/images/genexia-negro.png', alt: 'Genexia' },
+  { src: '/images/indira-blanco.png', alt: 'Indira' },
+  { src: '/images/logo-coral-02.png', alt: 'Logo Coral' },
+  { src: '/images/logo-coral-03.png', alt: 'Logo Coral' },
+  { src: '/images/logo-coral-04.png', alt: 'Logo Coral' },
+  { src: '/images/logo-oneview-negro.png', alt: 'One View' },
+  { src: '/images/vie-blanco.png', alt: 'Vie' }
 ];
 
 // Validation schemas
