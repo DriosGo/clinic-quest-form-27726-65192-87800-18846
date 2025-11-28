@@ -13,12 +13,24 @@ interface ForgotPasswordRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log("=== forgot-password function started ===");
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { email }: ForgotPasswordRequest = await req.json();
+    // Validate Resend API key
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY is not configured");
+      throw new Error("Configuración de email incompleta. Contacta al administrador.");
+    }
+    console.log("RESEND_API_KEY is configured");
+
+    const body = await req.json();
+    console.log("Request body received:", { email: body.email ? "***@***" : "missing" });
+    
+    const { email }: ForgotPasswordRequest = body;
 
     if (!email) {
       return new Response(
@@ -31,20 +43,36 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Create Supabase client
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Missing Supabase credentials:", { 
+        hasUrl: !!supabaseUrl, 
+        hasServiceKey: !!supabaseServiceKey 
+      });
+      throw new Error("Configuración de base de datos incompleta");
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    console.log("Supabase client created successfully");
 
     // Check if email exists in profiles
+    console.log("Looking up email in profiles...");
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("id, email, nombre_completo")
       .eq("email", email)
-      .single();
+      .maybeSingle();
 
-    if (profileError || !profile) {
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      throw new Error("Error al buscar el perfil");
+    }
+
+    if (!profile) {
       // Don't reveal if email exists or not for security
-      console.log("Email not found:", email);
+      console.log("Email not found in profiles");
       return new Response(
         JSON.stringify({ 
           message: "Si el correo existe, recibirás un código de recuperación" 
@@ -55,15 +83,19 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     }
+    
+    console.log("Profile found:", { id: profile.id, hasName: !!profile.nombre_completo });
 
     // Generate 6-digit code
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log("Reset code generated");
     
     // Set expiration to 10 minutes from now
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 10);
 
     // Save code to database
+    console.log("Saving reset code to database...");
     const { error: updateError } = await supabase
       .from("profiles")
       .update({
@@ -73,11 +105,15 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("id", profile.id);
 
     if (updateError) {
-      console.error("Error updating profile:", updateError);
-      throw new Error("Error al procesar la solicitud");
+      console.error("Error updating profile with reset code:", JSON.stringify(updateError));
+      throw new Error(`Error al guardar código: ${updateError.message}`);
     }
+    console.log("Reset code saved successfully");
 
     // Send email with code using Resend API
+    console.log("Sending email via Resend to:", email);
+    console.log("From address: noreply@updates.indigocorp.tech");
+    
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
