@@ -85,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Artemis <onboarding@resend.dev>",
+        from: "Artemis <noreply@updates.indigocorp.tech>",
         to: [email],
         subject: "Código de Recuperación de Contraseña",
         html: `
