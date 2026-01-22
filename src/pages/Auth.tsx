@@ -126,6 +126,8 @@ const Auth = () => {
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
           toast.error('Correo o contraseña incorrectos');
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('fetch')) {
+          toast.error('Error de conexión. Verifica tu internet e intenta de nuevo.');
         } else {
           toast.error(error.message);
         }
